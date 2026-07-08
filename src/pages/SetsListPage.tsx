@@ -203,7 +203,7 @@ export function SetsListPage() {
 
   function kindOf(entry: IndexEntry): 'cards' | 'stickers' {
     const id = entry.type === 'collection' ? entry.collectionId : entry.set.collectionId
-    return (id && collectionKind[id]) ?? 'cards'
+    return (id ? collectionKind[id] : undefined) ?? 'cards'
   }
 
   function renderEntry(entry: IndexEntry) {
