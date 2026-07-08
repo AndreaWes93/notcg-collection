@@ -1,0 +1,261 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { sets, collectionLogos } from '../data/sets'
+import { useOwnedCards } from '../hooks/useOwnedCards'
+import { Gauge } from '../components/Gauge'
+import { SignalDot, channelColorForId } from '../components/SignalDot'
+import { yearRangeLabel } from '../lib/yearRange'
+import type { CardSet } from '../types'
+
+type ChildEntry =
+  | { type: 'set'; set: CardSet }
+  | { type: 'series'; seriesId: string; seriesName: string; seriesDescription?: string; sets: CardSet[] }
+
+type IndexEntry =
+  | { type: 'set'; set: CardSet }
+  | { type: 'collection'; collectionId: string; collectionName: string; children: ChildEntry[] }
+
+function buildIndexEntries(allSets: CardSet[]): IndexEntry[] {
+  const entries: IndexEntry[] = []
+  const collectionIndex = new Map<string, number>()
+  const seriesIndexByCollection = new Map<string, Map<string, number>>()
+
+  for (const set of allSets) {
+    if (!set.collectionId) {
+      entries.push({ type: 'set', set })
+      continue
+    }
+
+    let collectionEntryIndex = collectionIndex.get(set.collectionId)
+    if (collectionEntryIndex === undefined) {
+      collectionEntryIndex = entries.length
+      collectionIndex.set(set.collectionId, collectionEntryIndex)
+      entries.push({
+        type: 'collection',
+        collectionId: set.collectionId,
+        collectionName: set.collectionName ?? set.collectionId,
+        children: [],
+      })
+    }
+    const collectionEntry = entries[collectionEntryIndex]
+    if (collectionEntry.type !== 'collection') continue
+
+    if (!set.seriesId) {
+      collectionEntry.children.push({ type: 'set', set })
+      continue
+    }
+
+    let seriesMap = seriesIndexByCollection.get(set.collectionId)
+    if (!seriesMap) {
+      seriesMap = new Map()
+      seriesIndexByCollection.set(set.collectionId, seriesMap)
+    }
+    const seriesChildIndex = seriesMap.get(set.seriesId)
+    if (seriesChildIndex === undefined) {
+      seriesMap.set(set.seriesId, collectionEntry.children.length)
+      collectionEntry.children.push({
+        type: 'series',
+        seriesId: set.seriesId,
+        seriesName: set.seriesName ?? set.seriesId,
+        seriesDescription: set.seriesDescription,
+        sets: [set],
+      })
+    } else {
+      const seriesEntry = collectionEntry.children[seriesChildIndex]
+      if (seriesEntry.type === 'series') seriesEntry.sets.push(set)
+    }
+  }
+
+  return entries
+}
+
+function totalsFor(setList: CardSet[], countOwned: (cardIds: string[]) => number) {
+  const totalCards = setList.reduce((sum, set) => sum + set.cards.length, 0)
+  const totalOwned = setList.reduce((sum, set) => sum + countOwned(set.cards.map((card) => card.id)), 0)
+  return { totalCards, totalOwned }
+}
+
+function flattenSets(children: ChildEntry[]): CardSet[] {
+  return children.flatMap((child) => (child.type === 'set' ? [child.set] : child.sets))
+}
+
+type RowContentProps = {
+  channelId: string
+  name: string
+  year?: number | string
+  description?: string
+  current: number
+  total: number
+  logoUrl?: string
+}
+
+function RowContent({ channelId, name, year, description, current, total, logoUrl }: RowContentProps) {
+  return (
+    <>
+      <div className="panel-id">
+        <SignalDot color={channelColorForId(channelId)} />
+        <span className="panel-id-name">{name}</span>
+        {logoUrl && <img src={logoUrl} alt="" className="panel-logo" loading="lazy" referrerPolicy="no-referrer" />}
+      </div>
+      <div className="panel-body">
+        <div className="panel-heading">
+          {year && <span className="panel-year">{year}</span>}
+          {description && <p className="panel-description">{description}</p>}
+        </div>
+        <Gauge current={current} total={total} />
+      </div>
+    </>
+  )
+}
+
+type SetRowProps = {
+  set: CardSet
+  countOwned: (cardIds: string[]) => number
+}
+
+function SetRow({ set, countOwned }: SetRowProps) {
+  const cardIds = set.cards.map((card) => card.id)
+  const owned = countOwned(cardIds)
+  const linkTo = set.seriesId ? `/series/${set.seriesId}#${set.id}` : `/sets/${set.id}`
+
+  return (
+    <Link to={linkTo} className="panel-row">
+      <RowContent
+        channelId={set.id}
+        name={set.name}
+        year={set.year}
+        description={set.description}
+        current={owned}
+        total={set.cards.length}
+      />
+    </Link>
+  )
+}
+
+type GroupRowProps = {
+  id: string
+  name: string
+  year?: string
+  description?: string
+  current: number
+  total: number
+  isExpanded: boolean
+  onToggle: () => void
+  logoUrl?: string
+}
+
+function GroupRow({ id, name, year, description, current, total, isExpanded, onToggle, logoUrl }: GroupRowProps) {
+  return (
+    <button
+      type="button"
+      className={`panel-row panel-row-toggle ${isExpanded ? 'panel-row-toggle-expanded' : ''}`}
+      onClick={onToggle}
+      aria-expanded={isExpanded}
+    >
+      <RowContent
+        channelId={id}
+        name={name}
+        year={year}
+        description={description}
+        current={current}
+        total={total}
+        logoUrl={logoUrl}
+      />
+      <span className={`panel-chevron ${isExpanded ? 'panel-chevron-open' : ''}`} aria-hidden="true">
+        &#9662;
+      </span>
+    </button>
+  )
+}
+
+export function SetsListPage() {
+  const { countOwned } = useOwnedCards()
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
+  if (sets.length === 0) {
+    return (
+      <div className="empty-state">
+        <svg className="empty-state-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M8 8 L20 8 M8 8 L8 20" stroke="currentColor" strokeWidth="3" fill="none" />
+          <path d="M56 8 L44 8 M56 8 L56 20" stroke="currentColor" strokeWidth="3" fill="none" />
+          <path d="M8 56 L20 56 M8 56 L8 44" stroke="currentColor" strokeWidth="3" fill="none" />
+          <path d="M56 56 L44 56 M56 56 L56 44" stroke="currentColor" strokeWidth="3" fill="none" />
+          <circle cx="32" cy="32" r="3" fill="currentColor" />
+        </svg>
+        <h2>No data logged</h2>
+        <p>
+          &gt; Add a set in <code>src/data/sets.ts</code> to start logging cards
+        </p>
+      </div>
+    )
+  }
+
+  const entries = buildIndexEntries(sets)
+
+  function toggle(key: string) {
+    setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
+
+  return (
+    <div className="binder-index">
+      {entries.map((entry) => {
+        if (entry.type === 'set') {
+          return <SetRow key={entry.set.id} set={entry.set} countOwned={countOwned} />
+        }
+
+        const collectionSets = flattenSets(entry.children)
+        const { totalCards, totalOwned } = totalsFor(collectionSets, countOwned)
+        const isExpanded = Boolean(expanded[entry.collectionId])
+
+        return (
+          <div key={entry.collectionId} className="panel-group">
+            <GroupRow
+              id={entry.collectionId}
+              name={entry.collectionName}
+              year={yearRangeLabel(collectionSets)}
+              current={totalOwned}
+              total={totalCards}
+              isExpanded={isExpanded}
+              onToggle={() => toggle(entry.collectionId)}
+              logoUrl={collectionLogos[entry.collectionId]}
+            />
+            {isExpanded && (
+              <div className="panel-nest">
+                {entry.children.map((child) => {
+                  if (child.type === 'set') {
+                    return <SetRow key={child.set.id} set={child.set} countOwned={countOwned} />
+                  }
+
+                  const seriesTotals = totalsFor(child.sets, countOwned)
+                  const seriesExpanded = Boolean(expanded[child.seriesId])
+
+                  return (
+                    <div key={child.seriesId} className="panel-group">
+                      <GroupRow
+                        id={child.seriesId}
+                        name={child.seriesName}
+                        year={yearRangeLabel(child.sets)}
+                        description={child.seriesDescription}
+                        current={seriesTotals.totalOwned}
+                        total={seriesTotals.totalCards}
+                        isExpanded={seriesExpanded}
+                        onToggle={() => toggle(child.seriesId)}
+                      />
+                      {seriesExpanded && (
+                        <div className="panel-nest">
+                          {child.sets.map((set) => (
+                            <SetRow key={set.id} set={set} countOwned={countOwned} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
