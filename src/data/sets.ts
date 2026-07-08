@@ -9,6 +9,13 @@ export const collectionLogos: Record<string, string> = {
   'topps-cards': 'https://archives.bulbagarden.net/wiki/Special:FilePath/Topps_logo.png',
   'dunkin-boomer-cards': 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Dunkin_Boomer_logo.jpg',
   'merlin-cards': 'https://archives.bulbagarden.net/wiki/Special:FilePath/Merlin-collections-logo.jpg',
+  'merlin-magic-message-cards': 'https://archives.bulbagarden.net/wiki/Special:FilePath/Merlin-collections-logo.jpg',
+}
+
+// Which top-level index section a collection (or a standalone set with no
+// collectionId) belongs under. Anything not listed here defaults to 'cards'.
+export const collectionKind: Record<string, 'cards' | 'stickers'> = {
+  'merlin-cards': 'stickers',
 }
 
 // Catalog of "No TCG" sets. Add sets here as they're provided.
@@ -4091,7 +4098,7 @@ export const sets: CardSet[] = [
       year: 1999,
       description: 'The first Merlin Pokémon sticker card set, based on the anime, with evolution, puzzle, and glittery cards.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [
       { id: 'merlin-series-1-normal-cards-001', setId: 'merlin-series-1', section: 'Normal cards', number: '1', name: 'Bulbasaur', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_1_-_1.jpg' },
       { id: 'merlin-series-1-normal-cards-002', setId: 'merlin-series-1', section: 'Normal cards', number: '2', name: 'Ivysaur', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_1_-_2.jpg' },
@@ -4377,7 +4384,7 @@ export const sets: CardSet[] = [
       year: 2000,
       description: 'Continues with more episode cards, plus sparkle cards - the only Merlin set with both regular and \'cracked ice\' holo versions.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [
       { id: 'merlin-series-2-episode-cards-001', setId: 'merlin-series-2', section: 'Episode cards', number: '1', name: 'Logo', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_2_-_1.jpg' },
       { id: 'merlin-series-2-episode-cards-002', setId: 'merlin-series-2', section: 'Episode cards', number: '2', name: 'Ash Pikachu Brock Misty', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_2_-_2.jpg' },
@@ -4603,7 +4610,7 @@ export const sets: CardSet[] = [
       year: 2000,
       description: 'Coming soon - 20 cards. Not yet catalogued.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [],
     },
     {
@@ -4612,7 +4619,7 @@ export const sets: CardSet[] = [
       year: 2001,
       description: 'Anime-based cards with puzzle and poster cards.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [
       { id: 'merlin-series-3-normal-cards-001', setId: 'merlin-series-3', section: 'Normal cards', number: '1', name: 'Pokémon Poké Ball', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_3_-_1.jpg' },
       { id: 'merlin-series-3-normal-cards-002', setId: 'merlin-series-3', section: 'Normal cards', number: '2', name: 'Ash 1/3', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_3_-_2.jpg' },
@@ -4748,7 +4755,7 @@ export const sets: CardSet[] = [
       year: 2001,
       description: 'Coming soon - 198 cards. Not yet catalogued.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [],
     },
     {
@@ -4757,7 +4764,7 @@ export const sets: CardSet[] = [
       year: 2002,
       description: 'The Johto League set, with episode, battle, and poster cards.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [
       { id: 'merlin-series-5-episode-cards-part-1-001', setId: 'merlin-series-5', section: 'Episode cards part 1', number: '1', name: 'logo', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_5_-_1.jpg' },
       { id: 'merlin-series-5-episode-cards-part-1-002', setId: 'merlin-series-5', section: 'Episode cards part 1', number: '2', name: 'jessie james meowth', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_5_-_2.jpg' },
@@ -4965,7 +4972,7 @@ export const sets: CardSet[] = [
       year: 2003,
       description: 'Coming soon - 222 mini cards. Not yet catalogued.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [],
     },
     {
@@ -4974,7 +4981,7 @@ export const sets: CardSet[] = [
       year: 2004,
       description: 'The Advanced set, based on the Advanced Generation series, with berry, quiz/letter, and poster cards.',
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [
       { id: 'merlin-series-6-berry-cards-B1', setId: 'merlin-series-6', section: 'Berry cards', number: 'B1', name: 'Tamato Berry', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_6_-_tamato_berry.jpg', backImageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_6_-_backside_tamato_berry.jpeg' },
       { id: 'merlin-series-6-berry-cards-B2', setId: 'merlin-series-6', section: 'Berry cards', number: 'B2', name: 'Oran Berry', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_6_-_oran_berry.jpg', backImageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Pokemon_Merlin_-_series_6_-_backside_oran_berry.jpg' },
@@ -5224,7 +5231,7 @@ export const sets: CardSet[] = [
       year: 2005,
       description: "Coming soon - 193 cards, the 'Ultimate sticker' set. Not yet catalogued.",
       collectionId: 'merlin-cards',
-      collectionName: 'Merlin Cards',
+      collectionName: 'Merlin Stickers',
       cards: [],
     },
     {
@@ -5232,7 +5239,7 @@ export const sets: CardSet[] = [
       name: 'Magic Message',
       year: 2006,
       description: 'The 10 year anniversary set, with Human and Attack Master and Magic Match-Up cards.',
-      collectionId: 'merlin-cards',
+      collectionId: 'merlin-magic-message-cards',
       collectionName: 'Merlin Cards',
       cards: [
       { id: 'merlin-magic-message-human-master-cards-001', setId: 'merlin-magic-message', section: 'Human - Master Cards', number: '1', name: 'Ash', imageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Magic_message_-_1.jpg', backImageUrl: 'https://archives.bulbagarden.net/wiki/Special:FilePath/Magic_message_-_backside_1.jpg' },

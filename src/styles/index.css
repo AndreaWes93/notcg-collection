@@ -239,6 +239,33 @@ button {
 
 /* ---------- Panel index (sets list) ---------- */
 
+.binder-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 0.5rem;
+}
+
+.binder-section-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.binder-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
 .binder-index {
   display: flex;
   flex-direction: column;

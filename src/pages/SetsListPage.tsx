@@ -1,11 +1,16 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { sets, collectionLogos } from '../data/sets'
+import { sets, collectionLogos, collectionKind } from '../data/sets'
 import { useOwnedCards } from '../hooks/useOwnedCards'
 import { Gauge } from '../components/Gauge'
 import { SignalDot, channelColorForId } from '../components/SignalDot'
 import { yearRangeLabel } from '../lib/yearRange'
 import type { CardSet } from '../types'
+
+const SECTION_LABELS: Record<'cards' | 'stickers', string> = {
+  cards: 'Cards',
+  stickers: 'Stickers',
+}
 
 type ChildEntry =
   | { type: 'set'; set: CardSet }
@@ -196,64 +201,83 @@ export function SetsListPage() {
     setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
-  return (
-    <div className="binder-index">
-      {entries.map((entry) => {
-        if (entry.type === 'set') {
-          return <SetRow key={entry.set.id} set={entry.set} countOwned={countOwned} />
-        }
+  function kindOf(entry: IndexEntry): 'cards' | 'stickers' {
+    const id = entry.type === 'collection' ? entry.collectionId : entry.set.collectionId
+    return (id && collectionKind[id]) ?? 'cards'
+  }
 
-        const collectionSets = flattenSets(entry.children)
-        const { totalCards, totalOwned } = totalsFor(collectionSets, countOwned)
-        const isExpanded = Boolean(expanded[entry.collectionId])
+  function renderEntry(entry: IndexEntry) {
+    if (entry.type === 'set') {
+      return <SetRow key={entry.set.id} set={entry.set} countOwned={countOwned} />
+    }
+
+    const collectionSets = flattenSets(entry.children)
+    const { totalCards, totalOwned } = totalsFor(collectionSets, countOwned)
+    const isExpanded = Boolean(expanded[entry.collectionId])
+
+    return (
+      <div key={entry.collectionId} className="panel-group">
+        <GroupRow
+          id={entry.collectionId}
+          name={entry.collectionName}
+          year={yearRangeLabel(collectionSets)}
+          current={totalOwned}
+          total={totalCards}
+          isExpanded={isExpanded}
+          onToggle={() => toggle(entry.collectionId)}
+          logoUrl={collectionLogos[entry.collectionId]}
+        />
+        {isExpanded && (
+          <div className="panel-nest">
+            {entry.children.map((child) => {
+              if (child.type === 'set') {
+                return <SetRow key={child.set.id} set={child.set} countOwned={countOwned} />
+              }
+
+              const seriesTotals = totalsFor(child.sets, countOwned)
+              const seriesExpanded = Boolean(expanded[child.seriesId])
+
+              return (
+                <div key={child.seriesId} className="panel-group">
+                  <GroupRow
+                    id={child.seriesId}
+                    name={child.seriesName}
+                    year={yearRangeLabel(child.sets)}
+                    description={child.seriesDescription}
+                    current={seriesTotals.totalOwned}
+                    total={seriesTotals.totalCards}
+                    isExpanded={seriesExpanded}
+                    onToggle={() => toggle(child.seriesId)}
+                  />
+                  {seriesExpanded && (
+                    <div className="panel-nest">
+                      {child.sets.map((set) => (
+                        <SetRow key={set.id} set={set} countOwned={countOwned} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const sections: Array<'cards' | 'stickers'> = ['cards', 'stickers']
+
+  return (
+    <div className="binder-sections">
+      {sections.map((kind) => {
+        const kindEntries = entries.filter((entry) => kindOf(entry) === kind)
+        if (kindEntries.length === 0) return null
 
         return (
-          <div key={entry.collectionId} className="panel-group">
-            <GroupRow
-              id={entry.collectionId}
-              name={entry.collectionName}
-              year={yearRangeLabel(collectionSets)}
-              current={totalOwned}
-              total={totalCards}
-              isExpanded={isExpanded}
-              onToggle={() => toggle(entry.collectionId)}
-              logoUrl={collectionLogos[entry.collectionId]}
-            />
-            {isExpanded && (
-              <div className="panel-nest">
-                {entry.children.map((child) => {
-                  if (child.type === 'set') {
-                    return <SetRow key={child.set.id} set={child.set} countOwned={countOwned} />
-                  }
-
-                  const seriesTotals = totalsFor(child.sets, countOwned)
-                  const seriesExpanded = Boolean(expanded[child.seriesId])
-
-                  return (
-                    <div key={child.seriesId} className="panel-group">
-                      <GroupRow
-                        id={child.seriesId}
-                        name={child.seriesName}
-                        year={yearRangeLabel(child.sets)}
-                        description={child.seriesDescription}
-                        current={seriesTotals.totalOwned}
-                        total={seriesTotals.totalCards}
-                        isExpanded={seriesExpanded}
-                        onToggle={() => toggle(child.seriesId)}
-                      />
-                      {seriesExpanded && (
-                        <div className="panel-nest">
-                          {child.sets.map((set) => (
-                            <SetRow key={set.id} set={set} countOwned={countOwned} />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+          <section key={kind} className="binder-section">
+            <h2 className="binder-section-title">{SECTION_LABELS[kind]}</h2>
+            <div className="binder-index">{kindEntries.map(renderEntry)}</div>
+          </section>
         )
       })}
     </div>
