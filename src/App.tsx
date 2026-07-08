@@ -1,4 +1,5 @@
 import { Route, Routes, Link } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import { SetsListPage } from './pages/SetsListPage'
 import { SetDetailPage } from './pages/SetDetailPage'
 import { SeriesDetailPage } from './pages/SeriesDetailPage'
@@ -23,6 +24,7 @@ function App() {
           <Route path="/series/:seriesId" element={<SeriesDetailPage />} />
         </Routes>
       </main>
+      <Analytics />
     </div>
   )
 }
