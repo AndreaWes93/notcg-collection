@@ -77,7 +77,11 @@ export function CardTile({ group, isOwned, onToggle }: CardTileProps) {
 
   function handleImageLoad(event: SyntheticEvent<HTMLImageElement>) {
     const img = event.currentTarget
-    if (img.naturalWidth > img.naturalHeight) setIsLandscape(true)
+    // Scans are rarely pixel-perfect square, so require a real margin before
+    // treating an image as landscape - otherwise near-square photos (off by a
+    // few px from compression/cropping) get needlessly letterboxed instead of
+    // filling the tile like every other card.
+    if (img.naturalWidth > img.naturalHeight * 1.15) setIsLandscape(true)
   }
 
   const sticker = fullyOwned && (
