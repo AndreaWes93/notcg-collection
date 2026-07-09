@@ -84,6 +84,25 @@ function flattenSets(children: ChildEntry[]): CardSet[] {
   return children.flatMap((child) => (child.type === 'set' ? [child.set] : child.sets))
 }
 
+function earliestYear(entry: IndexEntry): number {
+  const setList = entry.type === 'set' ? [entry.set] : flattenSets(entry.children)
+  return earliestYearOf(setList)
+}
+
+function earliestYearOfChild(child: ChildEntry): number {
+  const setList = child.type === 'set' ? [child.set] : child.sets
+  return earliestYearOf(setList)
+}
+
+function earliestYearOf(setList: CardSet[]): number {
+  const years = setList.map((set) => set.year).filter((year): year is number => year !== undefined)
+  return years.length > 0 ? Math.min(...years) : Infinity
+}
+
+function sortByYear<T>(items: T[], yearOf: (item: T) => number): T[] {
+  return [...items].sort((a, b) => yearOf(a) - yearOf(b))
+}
+
 type RowContentProps = {
   channelId: string
   name: string
@@ -229,13 +248,14 @@ export function SetsListPage() {
         />
         {isExpanded && (
           <div className="panel-nest">
-            {entry.children.map((child) => {
+            {sortByYear(entry.children, earliestYearOfChild).map((child) => {
               if (child.type === 'set') {
                 return <SetRow key={child.set.id} set={child.set} countOwned={countOwned} />
               }
 
               const seriesTotals = totalsFor(child.sets, countOwned)
               const seriesExpanded = Boolean(expanded[child.seriesId])
+              const seriesSets = sortByYear(child.sets, (set) => set.year ?? Infinity)
 
               return (
                 <div key={child.seriesId} className="panel-group">
@@ -251,7 +271,7 @@ export function SetsListPage() {
                   />
                   {seriesExpanded && (
                     <div className="panel-nest">
-                      {child.sets.map((set) => (
+                      {seriesSets.map((set) => (
                         <SetRow key={set.id} set={set} countOwned={countOwned} />
                       ))}
                     </div>
@@ -270,7 +290,9 @@ export function SetsListPage() {
   return (
     <div className="binder-sections">
       {sections.map((kind) => {
-        const kindEntries = entries.filter((entry) => kindOf(entry) === kind)
+        const kindEntries = entries
+          .filter((entry) => kindOf(entry) === kind)
+          .sort((a, b) => earliestYear(a) - earliestYear(b))
         if (kindEntries.length === 0) return null
 
         return (
