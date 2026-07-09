@@ -6,6 +6,7 @@ export type CardGroup = {
   name: string
   imageUrl?: string
   backImageUrl?: string
+  notes?: string
   cards: CardItem[]
 }
 
@@ -17,7 +18,7 @@ export function groupCards(cards: CardItem[]): CardGroup[] {
     const key = card.group ?? card.id
     let group = groups.get(key)
     if (!group) {
-      group = { key, number: card.number, name: card.name, imageUrl: card.imageUrl, cards: [] }
+      group = { key, number: card.number, name: card.name, imageUrl: card.imageUrl, notes: card.notes, cards: [] }
       groups.set(key, group)
       order.push(key)
     }
@@ -26,6 +27,9 @@ export function groupCards(cards: CardItem[]): CardGroup[] {
     }
     if (!group.backImageUrl && card.backImageUrl) {
       group.backImageUrl = card.backImageUrl
+    }
+    if (!group.notes && card.notes) {
+      group.notes = card.notes
     }
     group.cards.push(card)
   }

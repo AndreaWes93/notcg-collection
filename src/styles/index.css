@@ -565,6 +565,62 @@ button {
   text-decoration: underline;
 }
 
+.sibling-nav {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sibling-nav-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.65rem 0.9rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+  text-decoration: none;
+  background: var(--surface);
+  transition: background-color 0.15s ease;
+}
+
+.sibling-nav-link:hover {
+  background: var(--screen-dim);
+}
+
+.sibling-nav-prev + .sibling-nav-next,
+.sibling-nav-prev + .sibling-nav-disabled,
+.sibling-nav-disabled + .sibling-nav-next {
+  border-left: 1px dashed var(--line);
+}
+
+.sibling-nav-next {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.sibling-nav-arrow {
+  color: var(--amber-bright);
+  flex-shrink: 0;
+}
+
+.sibling-nav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sibling-nav-disabled {
+  background: var(--surface);
+}
+
 .filter-bar {
   display: flex;
   gap: 0.5rem;
@@ -685,6 +741,28 @@ button {
   object-fit: contain;
 }
 
+.card-tile-pocket-square {
+  aspect-ratio: 1 / 1;
+}
+
+.card-tile-type-badge {
+  position: absolute;
+  top: 0.3rem;
+  left: 0.3rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--amber-bright);
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  max-width: calc(100% - 0.6rem);
+  pointer-events: none;
+}
+
 .card-tile-corner {
   position: absolute;
   width: 12px;
@@ -754,21 +832,8 @@ button {
   letter-spacing: 0.02em;
 }
 
-.card-tile-placeholder-label {
-  font-family: var(--font-display);
-  font-size: 0.58rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(240, 166, 62, 0.5);
-}
-
 .card-tile-owned .card-tile-placeholder-number {
   color: rgba(38, 34, 26, 0.8);
-}
-
-.card-tile-owned .card-tile-placeholder-label {
-  display: none;
 }
 
 .card-tile-preview-label {

@@ -5,6 +5,8 @@ import { useOwnedCards } from '../hooks/useOwnedCards'
 import { Gauge } from '../components/Gauge'
 import { SignalDot, channelColorForId } from '../components/SignalDot'
 import { yearRangeLabel } from '../lib/yearRange'
+import { getOrderedCollectionChildren, sortByYear } from '../lib/collectionOrder'
+import type { ChildEntry } from '../lib/collectionOrder'
 import type { CardSet } from '../types'
 
 const SECTION_LABELS: Record<'cards' | 'stickers', string> = {
@@ -12,63 +14,28 @@ const SECTION_LABELS: Record<'cards' | 'stickers', string> = {
   stickers: 'Stickers',
 }
 
-type ChildEntry =
-  | { type: 'set'; set: CardSet }
-  | { type: 'series'; seriesId: string; seriesName: string; seriesDescription?: string; sets: CardSet[] }
-
 type IndexEntry =
   | { type: 'set'; set: CardSet }
   | { type: 'collection'; collectionId: string; collectionName: string; children: ChildEntry[] }
 
 function buildIndexEntries(allSets: CardSet[]): IndexEntry[] {
   const entries: IndexEntry[] = []
-  const collectionIndex = new Map<string, number>()
-  const seriesIndexByCollection = new Map<string, Map<string, number>>()
+  const seenCollections = new Set<string>()
 
   for (const set of allSets) {
     if (!set.collectionId) {
       entries.push({ type: 'set', set })
       continue
     }
+    if (seenCollections.has(set.collectionId)) continue
+    seenCollections.add(set.collectionId)
 
-    let collectionEntryIndex = collectionIndex.get(set.collectionId)
-    if (collectionEntryIndex === undefined) {
-      collectionEntryIndex = entries.length
-      collectionIndex.set(set.collectionId, collectionEntryIndex)
-      entries.push({
-        type: 'collection',
-        collectionId: set.collectionId,
-        collectionName: set.collectionName ?? set.collectionId,
-        children: [],
-      })
-    }
-    const collectionEntry = entries[collectionEntryIndex]
-    if (collectionEntry.type !== 'collection') continue
-
-    if (!set.seriesId) {
-      collectionEntry.children.push({ type: 'set', set })
-      continue
-    }
-
-    let seriesMap = seriesIndexByCollection.get(set.collectionId)
-    if (!seriesMap) {
-      seriesMap = new Map()
-      seriesIndexByCollection.set(set.collectionId, seriesMap)
-    }
-    const seriesChildIndex = seriesMap.get(set.seriesId)
-    if (seriesChildIndex === undefined) {
-      seriesMap.set(set.seriesId, collectionEntry.children.length)
-      collectionEntry.children.push({
-        type: 'series',
-        seriesId: set.seriesId,
-        seriesName: set.seriesName ?? set.seriesId,
-        seriesDescription: set.seriesDescription,
-        sets: [set],
-      })
-    } else {
-      const seriesEntry = collectionEntry.children[seriesChildIndex]
-      if (seriesEntry.type === 'series') seriesEntry.sets.push(set)
-    }
+    entries.push({
+      type: 'collection',
+      collectionId: set.collectionId,
+      collectionName: set.collectionName ?? set.collectionId,
+      children: getOrderedCollectionChildren(set.collectionId),
+    })
   }
 
   return entries
@@ -86,21 +53,8 @@ function flattenSets(children: ChildEntry[]): CardSet[] {
 
 function earliestYear(entry: IndexEntry): number {
   const setList = entry.type === 'set' ? [entry.set] : flattenSets(entry.children)
-  return earliestYearOf(setList)
-}
-
-function earliestYearOfChild(child: ChildEntry): number {
-  const setList = child.type === 'set' ? [child.set] : child.sets
-  return earliestYearOf(setList)
-}
-
-function earliestYearOf(setList: CardSet[]): number {
   const years = setList.map((set) => set.year).filter((year): year is number => year !== undefined)
   return years.length > 0 ? Math.min(...years) : Infinity
-}
-
-function sortByYear<T>(items: T[], yearOf: (item: T) => number): T[] {
-  return [...items].sort((a, b) => yearOf(a) - yearOf(b))
 }
 
 type RowContentProps = {
@@ -248,14 +202,18 @@ export function SetsListPage() {
         />
         {isExpanded && (
           <div className="panel-nest">
-            {sortByYear(entry.children, earliestYearOfChild).map((child) => {
+            {entry.children.map((child) => {
               if (child.type === 'set') {
                 return <SetRow key={child.set.id} set={child.set} countOwned={countOwned} />
               }
 
               const seriesTotals = totalsFor(child.sets, countOwned)
               const seriesExpanded = Boolean(expanded[child.seriesId])
-              const seriesSets = sortByYear(child.sets, (set) => set.year ?? Infinity)
+              const seriesSets = sortByYear(
+                child.sets,
+                (set) => set.year ?? Infinity,
+                (set) => set.name,
+              )
 
               return (
                 <div key={child.seriesId} className="panel-group">

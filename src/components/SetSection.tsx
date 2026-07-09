@@ -50,6 +50,7 @@ export function SetSection({ set }: SetSectionProps) {
 
   const cardIds = set.cards.map((card) => card.id)
   const owned = countOwned(cardIds)
+  const square = set.collectionId === 'amada-stickers' || set.collectionId === 'ensky-stickers'
 
   return (
     <section id={set.id} className="set-section">
@@ -89,7 +90,7 @@ export function SetSection({ set }: SetSectionProps) {
           {showSectionLabels && section.key && <h3 className="set-subsection-heading">{section.key}</h3>}
           <div className="card-grid">
             {section.visibleGroups.map((group) => (
-              <CardTile key={group.key} group={group} isOwned={isOwned} onToggle={toggleOwned} />
+              <CardTile key={group.key} group={group} isOwned={isOwned} onToggle={toggleOwned} square={square} />
             ))}
           </div>
         </div>

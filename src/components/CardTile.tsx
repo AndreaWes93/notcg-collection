@@ -6,6 +6,8 @@ type CardTileProps = {
   group: CardGroup
   isOwned: (cardId: string) => boolean
   onToggle: (cardId: string) => void
+  /** Use a 1:1 pocket instead of the default 3:4 one, for manufacturers whose physical stickers are square (e.g. Amada, Ensky). */
+  square?: boolean
 }
 
 type VariantColor = 'red' | 'green' | 'neutral'
@@ -42,7 +44,7 @@ function buildPreviewFrames(group: CardGroup): PreviewFrame[] {
   return frames
 }
 
-export function CardTile({ group, isOwned, onToggle }: CardTileProps) {
+export function CardTile({ group, isOwned, onToggle, square }: CardTileProps) {
   const ownedCards = group.cards.filter((card) => isOwned(card.id))
   const fullyOwned = ownedCards.length === group.cards.length
   const hasVariants = group.cards.length > 1
@@ -98,6 +100,7 @@ export function CardTile({ group, isOwned, onToggle }: CardTileProps) {
     <div
       className={[
         'card-tile-pocket',
+        square && !isLandscape && 'card-tile-pocket-square',
         partialColor && `card-tile-pocket-partial-${partialColor}`,
         isLandscape && 'card-tile-pocket-landscape',
       ]
@@ -116,13 +119,13 @@ export function CardTile({ group, isOwned, onToggle }: CardTileProps) {
       {!displayImageUrl && (
         <div className="card-tile-placeholder-plate" aria-hidden="true">
           <span className="card-tile-placeholder-number">{group.number}</span>
-          <span className="card-tile-placeholder-label">No signal</span>
         </div>
       )}
       <span className="card-tile-corner card-tile-corner-tl" aria-hidden="true" />
       <span className="card-tile-corner card-tile-corner-tr" aria-hidden="true" />
       <span className="card-tile-corner card-tile-corner-bl" aria-hidden="true" />
       <span className="card-tile-corner card-tile-corner-br" aria-hidden="true" />
+      {group.notes && <span className="card-tile-type-badge">{group.notes}</span>}
       {activeFrame && <span className="card-tile-preview-label">{activeFrame.label}</span>}
     </div>
   )

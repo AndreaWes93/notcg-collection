@@ -5,6 +5,7 @@ import { useOwnedCards } from '../hooks/useOwnedCards'
 import { Gauge } from '../components/Gauge'
 import { SignalDot, channelColorForId } from '../components/SignalDot'
 import { SetSection } from '../components/SetSection'
+import { SiblingNav } from '../components/SiblingNav'
 import { yearRangeLabel } from '../lib/yearRange'
 
 export function SeriesDetailPage() {
@@ -15,13 +16,16 @@ export function SeriesDetailPage() {
   const memberSets = useMemo(() => sets.filter((set) => set.seriesId === seriesId), [seriesId])
 
   useEffect(() => {
-    if (!location.hash) return
+    if (!location.hash) {
+      window.scrollTo(0, 0)
+      return
+    }
     const id = location.hash.slice(1)
     const timer = window.setTimeout(() => {
       document.getElementById(id)?.scrollIntoView({ behavior: 'auto', block: 'start' })
     }, 80)
     return () => window.clearTimeout(timer)
-  }, [location.hash, memberSets.length])
+  }, [location.hash, seriesId, memberSets.length])
 
   if (memberSets.length === 0) {
     return (
@@ -44,6 +48,7 @@ export function SeriesDetailPage() {
       <Link to="/" className="back-link">
         &larr; Back to index
       </Link>
+      <SiblingNav setId={memberSets[0].id} />
 
       <div className="binder-page-header">
         <h2>
