@@ -8,6 +8,9 @@ import type { CardItem, CardSet } from '../types'
 
 type Filter = 'all' | 'owned' | 'missing'
 
+// Manufacturers whose physical stickers are square, so their tiles should use a 1:1 pocket instead of the default 3:4 one.
+const SQUARE_COLLECTIONS = ['amada-stickers', 'ensky-stickers', 'meiji-stickers', 'topsun-stickers']
+
 type SetSectionProps = {
   set: CardSet
 }
@@ -50,7 +53,7 @@ export function SetSection({ set }: SetSectionProps) {
 
   const cardIds = set.cards.map((card) => card.id)
   const owned = countOwned(cardIds)
-  const square = set.collectionId === 'amada-stickers' || set.collectionId === 'ensky-stickers'
+  const square = set.collectionId !== undefined && SQUARE_COLLECTIONS.includes(set.collectionId)
 
   return (
     <section id={set.id} className="set-section">
