@@ -652,6 +652,17 @@ button {
   color: #26210f;
 }
 
+.mark-complete-btn {
+  margin-left: auto;
+  color: var(--signal-green);
+  border-color: var(--signal-green);
+}
+
+.mark-complete-btn:hover {
+  background: var(--signal-green);
+  color: var(--surface);
+}
+
 /* ---------- Specimen grid (cards) ---------- */
 
 .card-grid {
@@ -669,6 +680,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
   background: var(--surface);
   border-radius: 4px;
   padding: 0.6rem;
@@ -877,6 +889,8 @@ button {
   align-items: center;
   gap: 0.1rem;
   text-align: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .card-tile-number {
@@ -889,6 +903,8 @@ button {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--ink);
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 /* ---------- Variant switches ---------- */

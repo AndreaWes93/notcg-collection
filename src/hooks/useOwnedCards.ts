@@ -43,10 +43,16 @@ export function useOwnedCards() {
     setOwnedMap({ ...ownedMap, [cardId]: !ownedMap[cardId] })
   }, [])
 
+  const setManyOwned = useCallback((cardIds: string[], value: boolean) => {
+    const next = { ...ownedMap }
+    for (const id of cardIds) next[id] = value
+    setOwnedMap(next)
+  }, [])
+
   const countOwned = useCallback(
     (cardIds: string[]) => cardIds.reduce((count, id) => count + (owned[id] ? 1 : 0), 0),
     [owned],
   )
 
-  return { isOwned, toggleOwned, countOwned }
+  return { isOwned, toggleOwned, setManyOwned, countOwned }
 }

@@ -30,7 +30,7 @@ function partitionBySection(cards: CardItem[]) {
 }
 
 export function SetSection({ set }: SetSectionProps) {
-  const { isOwned, toggleOwned, countOwned } = useOwnedCards()
+  const { isOwned, toggleOwned, setManyOwned, countOwned } = useOwnedCards()
   const [filter, setFilter] = useState<Filter>('all')
 
   const sections = useMemo(() => partitionBySection(set.cards), [set])
@@ -53,7 +53,12 @@ export function SetSection({ set }: SetSectionProps) {
 
   const cardIds = set.cards.map((card) => card.id)
   const owned = countOwned(cardIds)
-  const square = set.collectionId !== undefined && SQUARE_COLLECTIONS.includes(set.collectionId)
+  const allOwned = owned === cardIds.length
+  const square = set.square ?? (set.collectionId !== undefined && SQUARE_COLLECTIONS.includes(set.collectionId))
+
+  function toggleAllOwned() {
+    setManyOwned(cardIds, !allOwned)
+  }
 
   return (
     <section id={set.id} className="set-section">
@@ -85,6 +90,9 @@ export function SetSection({ set }: SetSectionProps) {
         </button>
         <button className={filter === 'missing' ? 'active' : ''} onClick={() => setFilter('missing')}>
           Missing
+        </button>
+        <button className="mark-complete-btn" onClick={toggleAllOwned}>
+          {allOwned ? 'Clear set' : 'Mark set complete'}
         </button>
       </div>
 

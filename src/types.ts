@@ -30,5 +30,7 @@ export type CardSet = {
   collectionName?: string
   /** Reference images shown once at the top of the set page (e.g. shared card backs, or holo/foil variant examples), instead of per-card. */
   referenceImages?: { label: string; imageUrl: string }[]
+  /** Forces square (1:1) tiles for this set, overriding the collection-level default (e.g. a square variant within an otherwise rectangular card line). */
+  square?: boolean
   cards: CardItem[]
 }
