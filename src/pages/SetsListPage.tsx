@@ -30,11 +30,17 @@ function buildIndexEntries(allSets: CardSet[]): IndexEntry[] {
     if (seenCollections.has(set.collectionId)) continue
     seenCollections.add(set.collectionId)
 
+    const children = getOrderedCollectionChildren(set.collectionId)
+    if (children.length === 1 && children[0].type === 'set') {
+      entries.push({ type: 'set', set: children[0].set })
+      continue
+    }
+
     entries.push({
       type: 'collection',
       collectionId: set.collectionId,
       collectionName: set.collectionName ?? set.collectionId,
-      children: getOrderedCollectionChildren(set.collectionId),
+      children,
     })
   }
 
