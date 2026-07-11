@@ -395,6 +395,13 @@ button {
   color: var(--amber);
 }
 
+/* Plain (non-toggle) rows have no chevron, so their panel-body would otherwise
+   be wider than toggle rows' — reserve the same space here to keep gauge
+   bars the same length as rows with sub-sets. */
+.panel-row:not(.panel-row-toggle) > .panel-body {
+  padding-right: 3.85rem;
+}
+
 /* Each nesting level wraps its children in one more of these, so depth
    compounds naturally through normal box nesting instead of fixed margins. */
 .panel-nest {
