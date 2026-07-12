@@ -33,6 +33,8 @@ export const collectionKind: Record<string, 'cards' | 'stickers'> = {
 export const collectionDescriptions: Record<string, string> = {
   'bandai-carddass':
     "Bandai's original Carddass line: vending-machine cards sold in Japan from 1996 to 2000, starting with red/green Kanto artwork by Ken Sugimori and continuing into anime-based Main Series, EX, and Movie card sets.",
+  'bandai-zukan':
+    "Bandai's Carddass follow-up line, 2003-2007 - Pokédex-style 'zukan' (図鑑) cards sold in split 上巻/下巻 volumes per generation (Advanced Generation, then Fire Red & Leaf Green, then Diamond & Pearl), each padded out with anime-based Adventure Cards and holo, lenticular, 3D, or Prism Clear bonus subsets.",
   'meiji-cards':
     'Chocolate promotional cards packed with Meiji products in Japan, 1997-2002 - from the 151-card Get Cards debut through movie tie-ins, embossed foil, and the final VS Series battle cards.',
   'topsun-cards':
