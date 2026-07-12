@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { sets, collectionLogos, collectionKind } from '../data/sets'
+import { sets, collectionLogos, collectionKind, collectionDescriptions } from '../data/sets'
 import { useOwnedCards } from '../hooks/useOwnedCards'
 import { Gauge } from '../components/Gauge'
 import { SignalDot, channelColorForId } from '../components/SignalDot'
@@ -200,6 +200,7 @@ export function SetsListPage() {
           id={entry.collectionId}
           name={entry.collectionName}
           year={yearRangeLabel(collectionSets)}
+          description={collectionDescriptions[entry.collectionId]}
           current={totalOwned}
           total={totalCards}
           isExpanded={isExpanded}
