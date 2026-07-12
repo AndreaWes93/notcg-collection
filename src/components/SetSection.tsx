@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useOwnedCards } from '../hooks/useOwnedCards'
+import { useViewMode } from '../hooks/useViewMode'
 import { Gauge } from './Gauge'
 import { CardTile } from './CardTile'
+import { CardListRow } from './CardListRow'
 import { SignalDot, channelColorForId } from './SignalDot'
 import { groupCards } from '../lib/groupCards'
 import type { CardItem, CardSet } from '../types'
@@ -31,6 +33,7 @@ function partitionBySection(cards: CardItem[]) {
 
 export function SetSection({ set }: SetSectionProps) {
   const { isOwned, toggleOwned, setManyOwned, countOwned } = useOwnedCards()
+  const { mode: viewMode, setMode: setViewMode } = useViewMode()
   const [filter, setFilter] = useState<Filter>('all')
 
   const sections = useMemo(() => partitionBySection(set.cards), [set])
@@ -91,6 +94,14 @@ export function SetSection({ set }: SetSectionProps) {
         <button className={filter === 'missing' ? 'active' : ''} onClick={() => setFilter('missing')}>
           Missing
         </button>
+        <div className="view-mode-toggle">
+          <button className={viewMode === 'grid' ? 'active' : ''} onClick={() => setViewMode('grid')}>
+            Grid
+          </button>
+          <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>
+            List
+          </button>
+        </div>
         <button className="mark-complete-btn" onClick={toggleAllOwned}>
           {allOwned ? 'Clear set' : 'Mark set complete'}
         </button>
@@ -99,11 +110,19 @@ export function SetSection({ set }: SetSectionProps) {
       {visibleSections.map((section) => (
         <div key={section.key} className="set-subsection">
           {showSectionLabels && section.key && <h3 className="set-subsection-heading">{section.key}</h3>}
-          <div className="card-grid">
-            {section.visibleGroups.map((group) => (
-              <CardTile key={group.key} group={group} isOwned={isOwned} onToggle={toggleOwned} square={square} />
-            ))}
-          </div>
+          {viewMode === 'grid' ? (
+            <div className="card-grid">
+              {section.visibleGroups.map((group) => (
+                <CardTile key={group.key} group={group} isOwned={isOwned} onToggle={toggleOwned} square={square} />
+              ))}
+            </div>
+          ) : (
+            <div className="card-list">
+              {section.visibleGroups.map((group) => (
+                <CardListRow key={group.key} group={group} isOwned={isOwned} onToggle={toggleOwned} />
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </section>

@@ -630,6 +630,7 @@ button {
 
 .filter-bar {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin: 1.5rem 0 1.5rem;
 }
@@ -659,8 +660,38 @@ button {
   color: #26210f;
 }
 
-.mark-complete-btn {
+.view-mode-toggle {
   margin-left: auto;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.view-mode-toggle button {
+  padding: 0.45rem 0.85rem;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.view-mode-toggle button:hover {
+  border-color: var(--amber);
+}
+
+.view-mode-toggle button.active {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #26210f;
+}
+
+.mark-complete-btn {
   color: var(--signal-green);
   border-color: var(--signal-green);
 }
@@ -668,6 +699,119 @@ button {
 .mark-complete-btn:hover {
   background: var(--signal-green);
   color: var(--surface);
+}
+
+/* ---------- Specimen list (cards, list view) ---------- */
+
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: var(--chassis-deep);
+  border-radius: 6px;
+  padding: 0.75rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+.card-list-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: var(--surface);
+  border-radius: 4px;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.card-list-row:hover {
+  border-color: var(--amber);
+}
+
+.card-list-row:focus-within {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
+
+.card-list-row-owned {
+  border-color: var(--amber);
+  box-shadow: inset 0 0 0 1px var(--amber);
+}
+
+.card-list-thumb {
+  flex: none;
+  width: 42px;
+  height: 56px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--chassis);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-list-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-list-thumb-number {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  color: var(--ink-soft);
+}
+
+.card-list-details {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.card-list-number {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  min-width: 2.6rem;
+}
+
+.card-list-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-list-notes {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--amber);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40%;
+}
+
+.card-list-check {
+  flex: none;
+  width: 1.5rem;
+  text-align: center;
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.card-list-variant-row {
+  flex: none;
+  display: flex;
+  gap: 0.3rem;
 }
 
 /* ---------- Specimen grid (cards) ---------- */
@@ -1005,5 +1149,9 @@ button:focus-visible {
     flex-basis: auto;
     border-right: none;
     border-bottom: 1px solid var(--line);
+  }
+
+  .card-list-notes {
+    display: none;
   }
 }
